@@ -19,15 +19,6 @@ use \InvalidArgumentException;
 class PublishBehaviourInitializer implements BehaviourInitializer {
 
     /**
-     * Constructs a new instance
-     * @param \ride\library\orm\OrmManager $orm
-     * @return null
-     */
-    public function __construct($orm) {
-        $this->orm = $orm;
-    }
-
-    /**
      * Gets the behaviours for the model of the provided model table
      * @param \ride\library\orm\definition\ModelTable $modelTable
      * @return array An array with instances of Behaviour
@@ -103,63 +94,63 @@ class PublishBehaviourInitializer implements BehaviourInitializer {
             $this->performEntryClassGeneration($generator, $class);
         }
 
-        $this->performRelationGeneration($modelTable, $generator, $class);
+        // $this->performRelationGeneration($modelTable, $generator, $class);
     }
 
-    private function performRelationGeneration(ModelTable $modelTable, CodeGenerator $generator, CodeClass $class) {
-        $fields = $modelTable->getFields();
-        foreach ($fields as $field) {
-            $relationModelName = $field->getRelationModelName();
-            $relationModel = $this->orm->getModel($relationModelName);
-            if (!$relationModel->getMeta()->getOption('behaviour.publish')) {
-                continue;
-            }
+    // private function performRelationGeneration(ModelTable $modelTable, CodeGenerator $generator, CodeClass $class) {
+        // $fields = $modelTable->getFields();
+        // foreach ($fields as $field) {
+            // $relationModelName = $field->getRelationModelName();
+            // $relationModel = $this->orm->getModel($relationModelName);
+            // if (!$relationModel->getMeta()->getOption('behaviour.publish')) {
+                // continue;
+            // }
 
-            $suffix = ucfirst($field->getName());
+            // $suffix = ucfirst($field->getName());
 
-            if ($field instanceof HasManyField) {
-                $description = 'Get the published entries for this relation';
-                $code =
-'if (!$date) {
-    $date = time();
-}
+            // if ($field instanceof HasManyField) {
+                // $description = 'Get the published entries for this relation';
+                // $code =
+// 'if (!$date) {
+    // $date = time();
+// }
 
-$publishedEntries = array();
+// $publishedEntries = array();
 
-$entries = $this->get' . $suffix . '();
-foreach ($entries as $entry) {
-    if ($entry->isPublishedEntry($date)) {
-        $publishedEntries[$entry->getId()] = $entry;
-    }
-}
+// $entries = $this->get' . $suffix . '();
+// foreach ($entries as $entry) {
+    // if ($entry->isPublishedEntry($date)) {
+        // $publishedEntries[$entry->getId()] = $entry;
+    // }
+// }
 
-return $publishedEntries;';
-            } elseif ($field instanceof RelationField) {
-                $description = 'Gets the published entry of this relation';
-                $code =
-'if (!$date) {
-    $date = time();
-}
+// return $publishedEntries;';
+            // } elseif ($field instanceof RelationField) {
+                // $description = 'Gets the published entry of this relation';
+                // $code =
+// 'if (!$date) {
+    // $date = time();
+// }
 
-$entry = $this->get' . $suffix . '();
-if (!$entry->isPublishedEntry($date)) {
-    return null
-}
+// $entry = $this->get' . $suffix . '();
+// if (!$entry->isPublishedEntry($date)) {
+    // return null
+// }
 
-return $entry;';
-            }
+// return $entry;';
+            // }
 
-            $dateArgument = $generator->createVariable('date', 'integer');
-            $dateArgument->setDescription('Timestamp of the date to check');
-            $dateArgument->setDefaultValue(null);
+            // $dateArgument = $generator->createVariable('date', 'integer');
+            // $dateArgument->setDescription('Timestamp of the date to check');
+            // $dateArgument->setDefaultValue(null);
 
-            $getPublishedRelationMethod = $generator->createMethod('getPublished' . $suffix, array($dateArgument), $code);
-            $getPublishedRelationMethod->setDescription($description);
-            $getPublishedRelationMethod->setReturnValue($generator->createVariable('result', 'array'));
+            // $getPublishedRelationMethod = $generator->createMethod('getPublished' . $suffix, array($dateArgument), $code);
+            // $getPublishedRelationMethod->setDescription($description);
+            // $getPublishedRelationMethod->setReturnValue($generator->createVariable('result', 'array'));
 
-            $class->addMethod($getPublishedRelationMethod);
-        }
-    }
+            // $class->addMethod($getPublishedRelationMethod);
+        // }
+    // }
 
     private function performEntryClassGeneration(CodeGenerator $generator, CodeClass $class) {
         $class->addImplements('ride\\application\\orm\\entry\\PublishedEntry');
